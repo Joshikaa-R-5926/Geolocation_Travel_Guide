@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon } from 'lucide-react';
+import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
@@ -252,6 +252,195 @@ export default function App() {
         </div>
       </motion.div>
     </motion.div>
+  );
+
+  const Footer = () => (
+    <footer style={{
+      marginTop: '8rem',
+      background: 'linear-gradient(to top, rgba(2, 6, 23, 0.95), transparent)',
+      borderTop: '1px solid var(--glass-border)',
+      padding: '4rem 0 2rem'
+    }}>
+      <div className="container">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '3rem',
+          marginBottom: '3rem'
+        }}>
+          {/* About Section */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+              <Compass size={32} color="var(--primary)" />
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>TN Guide</h3>
+            </div>
+            <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Your ultimate companion for exploring the rich cultural heritage and natural beauty of Tamil Nadu.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              {[
+                { icon: <Facebook size={20} />, link: '#' },
+                { icon: <Twitter size={20} />, link: '#' },
+                { icon: <Instagram size={20} />, link: '#' },
+                { icon: <Linkedin size={20} />, link: '#' }
+              ].map((social, idx) => (
+                <a
+                  key={idx}
+                  href={social.link}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--glass-border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-muted)',
+                    transition: 'all 0.3s ease',
+                    textDecoration: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--primary)';
+                    e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = 'var(--text-muted)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'white' }}>Quick Links</h4>
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {['Home', 'Destinations', 'Quiz', 'About Us', 'Contact'].map((link, idx) => (
+                <li key={idx}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (link === 'Home') setScreen('home');
+                      else if (link === 'Quiz') setScreen('quiz');
+                    }}
+                    style={{
+                      color: 'var(--text-muted)',
+                      textDecoration: 'none',
+                      transition: 'all 0.3s ease',
+                      display: 'inline-block'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--primary)';
+                      e.currentTarget.style.transform = 'translateX(5px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--text-muted)';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }}
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Popular Destinations */}
+          <div>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'white' }}>Popular Destinations</h4>
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {['Chennai', 'Coimbatore', 'Madurai', 'Ooty', 'Kodaikanal'].map((dest, idx) => (
+                <li key={idx}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPlace(dest);
+                      handleExplore(dest);
+                    }}
+                    style={{
+                      color: 'var(--text-muted)',
+                      textDecoration: 'none',
+                      transition: 'all 0.3s ease',
+                      display: 'inline-block'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--primary)';
+                      e.currentTarget.style.transform = 'translateX(5px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--text-muted)';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }}
+                  >
+                    {dest}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'white' }}>Contact Us</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                <Mail size={18} color="var(--primary)" />
+                <span style={{ fontSize: '0.9rem' }}>info@tnguide.com</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                <Phone size={18} color="var(--primary)" />
+                <span style={{ fontSize: '0.9rem' }}>+91 123 456 7890</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                <MapPin size={18} color="var(--primary)" />
+                <span style={{ fontSize: '0.9rem' }}>Chennai, Tamil Nadu, India</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div style={{
+          paddingTop: '2rem',
+          borderTop: '1px solid var(--glass-border)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>
+            © 2026 TN Guide. All rights reserved. Made with ❤️ for Tamil Nadu
+          </p>
+          <div style={{ display: 'flex', gap: '2rem' }}>
+            {['Privacy Policy', 'Terms of Service', 'Sitemap'].map((link, idx) => (
+              <a
+                key={idx}
+                href="#"
+                style={{
+                  color: 'var(--text-muted)',
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  transition: 'color 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 
   return (
@@ -892,6 +1081,8 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      <Footer />
     </div>
   );
 }

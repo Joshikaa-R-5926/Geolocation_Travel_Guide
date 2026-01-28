@@ -483,12 +483,14 @@ export default function App() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
                           flex: 1,
-                          background: 'transparent',
+                          background: 'rgba(255,255,255,0.05)',
                           border: 'none',
-                          padding: '0.5rem',
+                          padding: '0.75rem 1rem',
                           fontSize: '1.1rem',
                           color: 'white',
-                          outline: 'none'
+                          fontWeight: 500,
+                          outline: 'none',
+                          borderRadius: '8px'
                         }}
                         onKeyPress={(e) => {
                           if (e.key === 'Enter' && searchQuery) {
@@ -543,7 +545,8 @@ export default function App() {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             setCategoryFilter(category.value);
-                            handleExplore();
+                            setPlace('Chennai');
+                            handleExplore('Chennai');
                           }}
                           style={{
                             padding: '1.5rem 1rem',

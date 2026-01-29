@@ -1,89 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github, TreePine } from 'lucide-react';
+import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
-
-const findSearchMatch = (query) => {
-  if (!query) return null;
-  const lowerQuery = query.toLowerCase().trim();
-
-  // 1. Direct District Match (Exact/Close)
-  const exactDistrict = Object.keys(mockLocations).find(key => key.toLowerCase() === lowerQuery);
-  if (exactDistrict) return { type: 'district', districtKey: exactDistrict };
-
-  // 2. Direct Place Match (Exact)
-  for (const [key, data] of Object.entries(mockLocations)) {
-    const placeMatch = data.places.find(p => p.name.toLowerCase() === lowerQuery);
-    if (placeMatch) return { type: 'place', districtKey: key, placeData: placeMatch };
-  }
-
-  // 3. Broad Search (Aggregated Results)
-  const aggregatedPlaces = [];
-  Object.entries(mockLocations).forEach(([key, data]) => {
-    data.places.forEach(p => {
-      // Match Name OR Category
-      const isNameMatch = p.name.toLowerCase().includes(lowerQuery);
-      const isCategoryMatch = p.category && p.category.some(cat => cat.toLowerCase().includes(lowerQuery));
-
-      if (isNameMatch || isCategoryMatch) {
-        aggregatedPlaces.push({ ...p, _district: key }); // Keep track of origin
-      }
-    });
-  });
-
-  if (aggregatedPlaces.length > 0) {
-    if (aggregatedPlaces.length === 1) {
-      // If only one result, treat as specific place
-      return { type: 'place', districtKey: aggregatedPlaces[0]._district, placeData: aggregatedPlaces[0] };
-    }
-    return {
-      type: 'virtual',
-      data: {
-        name: `Results for "${query}"`,
-        description: `Found ${aggregatedPlaces.length} destinations matching your search.`,
-        places: aggregatedPlaces,
-        weather: { temp: 28, condition: 'Varied', forecast: [] } // Dummy weather
-      }
-    };
-  }
-
-  // 4. Partial District Fallback
-  const partialDistrict = Object.keys(mockLocations).find(key => key.toLowerCase().includes(lowerQuery));
-  if (partialDistrict) return { type: 'district', districtKey: partialDistrict };
-
-  return null;
-};
-
-const Toast = ({ message, onClose }) => (
-  <motion.div
-    initial={{ opacity: 0, y: -50, x: '-50%' }}
-    animate={{ opacity: 1, y: 20, x: '-50%' }}
-    exit={{ opacity: 0, y: -50, x: '-50%' }}
-    style={{
-      position: 'fixed',
-      top: '0',
-      left: '50%',
-      zIndex: 1000,
-      background: 'rgba(220, 38, 38, 0.9)',
-      color: 'white',
-      padding: '1rem 2rem',
-      borderRadius: '30px',
-      backdropFilter: 'blur(10px)',
-      boxShadow: '0 10px 30px rgba(220, 38, 38, 0.3)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      fontWeight: 600
-    }}
-  >
-    <AlertTriangle size={20} />
-    {message}
-    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', marginLeft: '10px', cursor: 'pointer' }}>
-      <X size={18} />
-    </button>
-  </motion.div>
-);
 
 export default function App() {
   const [screen, setScreen] = useState('home');
@@ -100,38 +19,6 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [notification, setNotification] = useState(null);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSuggestions([]);
-      return;
-    }
-
-    const lowerQuery = searchQuery.toLowerCase().trim();
-    const newSuggestions = [];
-
-    Object.entries(mockLocations).forEach(([key, data]) => {
-      // District Match
-      if (key.toLowerCase().includes(lowerQuery)) {
-        newSuggestions.push({ type: 'District', name: key });
-      }
-      // Places Match
-      data.places.forEach(p => {
-        if (p.name.toLowerCase().includes(lowerQuery)) {
-          newSuggestions.push({ type: 'Place', name: p.name, district: key });
-        }
-      });
-    });
-
-    setSuggestions(newSuggestions.slice(0, 5)); // Limit to 5 suggestions
-  }, [searchQuery]);
-
-  const showNotification = (msg) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 3000);
-  };
 
   useEffect(() => {
     if (isLightMode) document.documentElement.classList.add('light-mode');
@@ -175,51 +62,14 @@ export default function App() {
     return sorted;
   };
 
-  const handleExplore = (targetInput) => {
-    let match = null;
-    const queryToUse = targetInput || searchQuery;
-
-    if (queryToUse) {
-      match = findSearchMatch(queryToUse);
-    }
-    // Fallback to current default 'place' if valid and no search query
-    else if (!queryToUse && place && mockLocations[place]) {
-      match = { type: 'district', districtKey: place };
-    }
-
-    if (!match) {
-      showNotification("Result not found. Try another destination!");
-      return;
-    }
-
-    setSuggestions([]); // Clear suggestions logic
-    if (targetInput) setSearchQuery(targetInput); // Update input to match selection
-
-    // Apply Logic
-    if (match.type === 'district') {
-      setPlace(match.districtKey);
-      setSelectedData(mockLocations[match.districtKey]);
-      setMapView(false);
-      setCategoryFilter('All');
-      setSortBy('recommended');
-      setScreen('places');
-      setSelectedPlaceDetail(null);
-    } else if (match.type === 'place') {
-      setPlace(match.districtKey);
-      setSelectedData(mockLocations[match.districtKey]);
-      setMapView(false);
-      setCategoryFilter('All');
-      setSortBy('recommended');
-      setScreen('places');
-      setTimeout(() => setSelectedPlaceDetail(match.placeData), 100);
-    } else if (match.type === 'virtual') {
-      setSelectedData(match.data);
-      setMapView(false);
-      setCategoryFilter('All');
-      setSortBy('recommended');
-      setScreen('places');
-      setSelectedPlaceDetail(null);
-    }
+  const handleExplore = (targetPlace) => {
+    const p = targetPlace || place;
+    const data = mockLocations[p] || mockLocations['Chennai'];
+    setSelectedData(data);
+    setMapView(false);
+    setCategoryFilter('All');
+    setSortBy('recommended');
+    setScreen('places');
   };
 
   const PageTransition = ({ children }) => (
@@ -596,9 +446,6 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar />
-      <AnimatePresence>
-        {notification && <Toast message={notification} onClose={() => setNotification(null)} />}
-      </AnimatePresence>
       <div className="container">
         <AnimatePresence mode="wait">
           {screen === 'home' && (
@@ -627,97 +474,52 @@ export default function App() {
                 <div style={{ maxWidth: '700px' }}>
                   {/* Search Bar */}
                   <div className="glass" style={{ padding: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <Search size={24} color="var(--primary)" />
-                      <div style={{ flex: 1, position: 'relative' }}>
-                        <input
-                          type="text"
-                          placeholder="Search places, districts, or themes..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          onFocus={() => setIsSearchFocused(true)}
-                          onBlur={() => setTimeout(() => setIsSearchFocused(false), 100)}
-                          style={{
-                            width: '100%',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: 'none',
-                            padding: '0.75rem 1rem',
-                            fontSize: '1.1rem',
-                            color: 'white',
-                            fontWeight: 500,
-                            outline: 'none',
-                            borderRadius: '8px'
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleExplore();
+                      <input
+                        type="text"
+                        placeholder="Search destinations in Tamil Nadu..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                          flex: 1,
+                          background: 'rgba(255,255,255,0.05)',
+                          border: 'none',
+                          padding: '0.75rem 1rem',
+                          fontSize: '1.1rem',
+                          color: 'white',
+                          fontWeight: 500,
+                          outline: 'none',
+                          borderRadius: '8px'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && searchQuery) {
+                            const matchedLocation = Object.keys(mockLocations).find(loc =>
+                              loc.toLowerCase().includes(searchQuery.toLowerCase())
+                            );
+                            if (matchedLocation) {
+                              setPlace(matchedLocation);
+                              handleExplore(matchedLocation);
                             }
-                          }}
-                        />
-                        {/* Search Suggestions Dropdown */}
-                        <AnimatePresence>
-                          {suggestions.length > 0 && (
-                            <motion.ul
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                background: '#0f172a', // Solid dark background
-                                borderRadius: '12px',
-                                marginTop: '8px',
-                                padding: '0.5rem 0',
-                                listStyle: 'none',
-                                zIndex: 9999, // Super high z-index
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-                                maxHeight: '300px', // Prevent too long
-                                overflowY: 'auto'
-                              }}
-                            >
-                              {suggestions.map((s, i) => (
-                                <li
-                                  key={i}
-                                  onClick={() => handleExplore(s.name)}
-                                  style={{
-                                    padding: '1rem 1.5rem',
-                                    cursor: 'pointer',
-                                    borderBottom: i !== suggestions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    color: 'white',
-                                    transition: 'background 0.2s',
-                                    background: 'transparent'
-                                  }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{
-                                      padding: '8px',
-                                      borderRadius: '50%',
-                                      background: s.type === 'District' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(34, 211, 238, 0.2)',
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}>
-                                      {s.type === 'District' ? <MapPin size={16} color="var(--primary)" /> : <TreePine size={16} color="var(--accent)" />}
-                                    </div>
-                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{s.name}</span>
-                                  </div>
-                                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.type}</span>
-                                </li>
-                              ))}
-                            </motion.ul>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                          }
+                        }}
+                      />
                       <button
                         className="btn-primary"
                         style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
-                        onClick={() => handleExplore()}
+                        onClick={() => {
+                          if (searchQuery) {
+                            const matchedLocation = Object.keys(mockLocations).find(loc =>
+                              loc.toLowerCase().includes(searchQuery.toLowerCase())
+                            );
+                            if (matchedLocation) {
+                              setPlace(matchedLocation);
+                              handleExplore(matchedLocation);
+                            }
+                          } else {
+                            handleExplore();
+                          }
+                        }}
                       >
                         Explore
                       </button>

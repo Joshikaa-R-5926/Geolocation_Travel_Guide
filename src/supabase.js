@@ -57,6 +57,7 @@ const enhancePlaces = (places) => {
         category: place.category || getCategory(place.name),
         entryFee: place.entryFee || (Math.random() > 0.6 ? 'Free' : `₹${[20, 30, 50, 100, 150][idx % 5]}`),
         duration: place.duration || ['1-2 hours', '2-3 hours', '3-4 hours', 'Half day', 'Full day'][idx % 5],
+        bestTime: place.bestTime || ['Oct to Mar', 'Year round', 'Nov to Feb', 'Sep to May'][idx % 4],
         badge: place.badge || (idx < 2 ? 'Must Visit' : idx < 4 ? 'Popular' : null)
     }));
 };
@@ -640,3 +641,10 @@ export const mockLocations = {
         weather: { temp: 30, condition: 'Sunny', forecast: getForecast(30) }
     }
 };
+
+// Automatically enhance all places in mockLocations with metadata
+Object.keys(mockLocations).forEach(key => {
+    if (mockLocations[key].places) {
+        mockLocations[key].places = enhancePlaces(mockLocations[key].places);
+    }
+});

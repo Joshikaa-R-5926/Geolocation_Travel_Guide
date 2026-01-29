@@ -48,12 +48,6 @@ const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
         <Zap size={14} /> Offline Ready
       </div>
       <button
-        className={`nav-btn ${screen === 'quiz' ? 'active' : ''}`}
-        onClick={() => setScreen('quiz')}
-      >
-        <Trophy size={18} /> <span>Quiz</span>
-      </button>
-      <button
         onClick={() => setIsLightMode(!isLightMode)}
         className="glass theme-toggle-btn"
         style={{ width: '40px', height: '40px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: isLightMode ? 'var(--text)' : 'var(--primary)', cursor: 'pointer', background: 'var(--glass-highlight)', border: '1px solid var(--glass-border)' }}
@@ -106,7 +100,9 @@ const Carousel = ({ images, name }) => {
   );
 };
 
-const QuizScreen = ({ setPlace, setDays, setMaxBudget, handleExplore }) => {
+const QuizModal = ({ isOpen, onClose, setPlace, setDays, setMaxBudget, handleExplore }) => {
+  if (!isOpen) return null;
+
   const questions = [
     { q: "What's your preferred travel budget?", options: [{ t: "Budget Friendly", v: 10000 }, { t: "Moderate", v: 30000 }, { t: "Luxury", v: 70000 }] },
     { q: "How long is your escape?", options: [{ t: "Quick Trip (1-2 days)", v: 2 }, { t: "Weekend (3-4 days)", v: 4 }, { t: "Long Break (5+ days)", v: 7 }] },
@@ -127,27 +123,45 @@ const QuizScreen = ({ setPlace, setDays, setMaxBudget, handleExplore }) => {
       setDays(newResults[1]);
       setMaxBudget(newResults[0]);
       handleExplore(destination);
+      onClose();
     }
   };
 
   return (
-    <PageTransition key="quiz">
-      <div className="glass quiz-card">
-        <div className="quiz-progress">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="modal-overlay"
+      onClick={onClose}
+      style={{ zIndex: 2000 }}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="glass modal-content"
+        onClick={e => e.stopPropagation()}
+        style={{ maxWidth: '500px', width: '90%', padding: '2.5rem', borderRadius: '24px', position: 'relative' }}
+      >
+        <button onClick={onClose} style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+          <X size={24} />
+        </button>
+        <div className="quiz-progress" style={{ marginTop: '1rem' }}>
           <div className="quiz-progress-bar" style={{ width: `${((step + 1) / questions.length) * 100}%` }}></div>
         </div>
-        <h2 style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--text)' }}>Destination Matcher</h2>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '3rem' }}>Question {step + 1} of {questions.length}</p>
-        <h3 style={{ fontSize: '1.8rem', marginBottom: '3rem', color: 'var(--text)' }}>{questions[step].q}</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <h2 style={{ fontSize: '1.8rem', margin: '1.5rem 0 0.5rem', color: 'var(--text)' }}>Destination Matcher</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Step {step + 1} of {questions.length}</p>
+        <h3 style={{ fontSize: '1.4rem', marginBottom: '2rem', color: 'var(--text)', lineHeight: '1.4' }}>{questions[step].q}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {questions[step].options.map((opt, i) => (
             <button key={i} className="quiz-option" onClick={() => handleNext(opt.v)}>
               {opt.t}
             </button>
           ))}
         </div>
-      </div>
-    </PageTransition>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -419,6 +433,7 @@ export default function App() {
   const [favorites, setFavorites] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
 
   // Search State
   const [searchInput, setSearchInput] = useState('');
@@ -444,7 +459,7 @@ export default function App() {
 
     // Filter by category
     if (categoryFilter !== 'All') {
-      filtered = filtered.filter(p => p.category?.includes(categoryFilter));
+      filtered = filtered.filter(p => p.category && (Array.isArray(p.category) ? p.category.includes(categoryFilter) : p.category === categoryFilter));
     }
 
     // Sort
@@ -717,14 +732,13 @@ export default function App() {
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                   {selectedData?.mapEmbedUrl && (
-                    <button
-                      className={`btn-secondary ${mapView ? 'active' : ''}`}
-                      onClick={() => setMapView(!mapView)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '8px', color: mapView ? 'var(--primary)' : 'white' }}
-                    >
+                    <button className={`btn-secondary ${mapView ? 'active' : ''}`} onClick={() => setMapView(!mapView)}>
                       <Map size={18} /> {mapView ? 'Show Places' : 'Interactive Map'}
                     </button>
                   )}
+                  <button className="btn-secondary" onClick={() => setIsQuizOpen(true)} style={{ color: 'var(--primary)' }}>
+                    <Trophy size={18} /> Take Quiz
+                  </button>
                   <button className="btn-secondary" onClick={() => setScreen('cost')}>
                     <DollarSign size={18} /> Budget Calculator
                   </button>
@@ -904,8 +918,8 @@ export default function App() {
                             )}
                           </div>
 
-                          {/* Categories */}
-                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          {/* Categories and Best Time */}
+                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                             {p.category?.map((cat, i) => (
                               <span
                                 key={i}
@@ -924,6 +938,9 @@ export default function App() {
                                 <Tag size={12} /> {cat}
                               </span>
                             ))}
+                            <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
+                              <Calendar size={14} /> {p.bestTime}
+                            </div>
                           </div>
 
                           <p style={{
@@ -951,6 +968,17 @@ export default function App() {
 
           {/* Fallback/Other Screens (Cost, Weather - Placeholder logic from original, reused screen states) */}
 
+
+          {isQuizOpen && (
+            <QuizModal
+              isOpen={isQuizOpen}
+              onClose={() => setIsQuizOpen(false)}
+              setPlace={setPlace}
+              setDays={setDays}
+              setMaxBudget={setMaxBudget}
+              handleExplore={handleExplore}
+            />
+          )}
 
           {screen === 'cost' && (
             <PageTransition key="cost">

@@ -3,29 +3,8 @@ import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
-
-// --- Configuration ---
-const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your actual key
-
-// --- Helper Functions ---
-const loadGoogleMapsScript = (callback) => {
-  if (window.google && window.google.maps) {
-    callback();
-    return;
-  }
-  const existingScript = document.getElementById('google-maps-script');
-  if (existingScript) {
-    existingScript.addEventListener('load', callback);
-    return;
-  }
-  const script = document.createElement('script');
-  script.id = 'google-maps-script';
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-  script.async = true;
-  script.defer = true;
-  script.onload = callback;
-  document.body.appendChild(script);
-};
+import BudgetCalculator from './components/BudgetCalculator';
+import WeatherInfo from './components/WeatherInfo';
 
 // --- Helper for Global Search ---
 const getAllPlaces = () => {
@@ -444,146 +423,6 @@ export default function App() {
   const [searchInput, setSearchInput] = useState('');
   const [searchAlert, setSearchAlert] = useState(null);
 
-  // Map Refs
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const markersRef = useRef([]);
-
-  // --- Map Initialization Logic ---
-  useEffect(() => {
-    if (mapView && selectedData) {
-      loadGoogleMapsScript(() => {
-        initMap();
-      });
-    }
-  }, [mapView, selectedData]);
-
-  const initMap = () => {
-    if (!mapRef.current || !window.google) return;
-
-    // Define center: use selectedData coordinates or fallback to TN center
-    // If selectedData is "Tamil Nadu" (global), use generic center
-    const center = selectedData.coordinates || (selectedData.name === 'Tamil Nadu' ? { lat: 10.7905, lng: 78.7047 } : { lat: 11.1271, lng: 78.6569 });
-
-    // Initialize Map if not exists or resets if needed (though we usually want to just update center)
-    // For simplicity, we re-create or update center
-    if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center,
-        zoom: selectedData.name === 'Tamil Nadu' ? 7 : 11,
-        styles: [
-          {
-            "elementType": "geometry",
-            "stylers": [{ "color": "#242f3e" }]
-          },
-          {
-            "elementType": "labels.text.stroke",
-            "stylers": [{ "color": "#242f3e" }]
-          },
-          {
-            "elementType": "labels.text.fill",
-            "stylers": [{ "color": "#746855" }]
-          },
-          {
-            "featureType": "administrative.locality",
-            "elementType": "labels.text.fill",
-            "stylers": [{ "color": "#d59563" }]
-          },
-          {
-            "featureType": "poi",
-            "elementType": "labels.text.fill",
-            "stylers": [{ "color": "#d59563" }]
-          },
-          {
-            "featureType": "poi.park",
-            "elementType": "geometry",
-            "stylers": [{ "color": "#263c3f" }]
-          },
-          {
-            "featureType": "poi.park",
-            "elementType": "labels.text.fill",
-            "stylers": [{ "color": "#6b9a76" }]
-          },
-          {
-            "featureType": "road",
-            "elementType": "geometry",
-            "stylers": [{ "color": "#38414e" }]
-          },
-          {
-            "featureType": "road",
-            "elementType": "geometry.stroke",
-            "stylers": [{ "color": "#212a37" }]
-          },
-          {
-            "featureType": "water",
-            "elementType": "geometry",
-            "stylers": [{ "color": "#17263c" }]
-          }
-        ]
-      });
-    } else {
-      mapInstanceRef.current.setCenter(center);
-      mapInstanceRef.current.setZoom(selectedData.name === 'Tamil Nadu' ? 7 : 11);
-    }
-
-    // Clear old markers
-    markersRef.current.forEach(m => m.setMap(null));
-    markersRef.current = [];
-
-    // Add new markers
-    if (selectedData.places) {
-      selectedData.places.forEach((place, index) => {
-        // Jitter Logic: If no specific lat/lng for the place, generate one around the center
-        let position = place.coordinates; // Assume place might have it in future
-
-        if (!position) {
-          // Create deterministic jitter based on index
-          // Distribute in a spiral or circle to avoid overlap
-          const angle = (index * (360 / Math.min(selectedData.places.length, 15))) * (Math.PI / 180);
-          // Random radius between 0.02 and 0.08 degrees (approx 2-8km)
-          const radius = 0.02 + ((index % 5) * 0.015);
-
-          position = {
-            lat: center.lat + (Math.cos(angle) * radius),
-            lng: center.lng + (Math.sin(angle) * radius)
-          };
-        }
-
-        const marker = new window.google.maps.Marker({
-          position,
-          map: mapInstanceRef.current,
-          title: place.name,
-          animation: window.google.maps.Animation.DROP
-        });
-
-        const infoWindow = new window.google.maps.InfoWindow({
-          content: `
-                <div style="color: #333; padding: 5px; min-width: 150px;">
-                    <h4 style="margin: 0 0 5px 0; font-size: 16px;">${place.name}</h4>
-                    <p style="margin: 0; font-size: 13px; color: #666;">${place.description?.substring(0, 50)}...</p>
-                    <button id="btn-${index}" style="margin-top: 8px; background: #eab308; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; color: white;">View Details</button>
-                </div>
-            `
-        });
-
-        marker.addListener("click", () => {
-          infoWindow.open(mapInstanceRef.current, marker);
-          // Add click listener to the button inside infoWindow after it's attached to DOM
-          setTimeout(() => {
-            const btn = document.getElementById(`btn-${index}`);
-            if (btn) {
-              btn.onclick = () => {
-                setSelectedPlaceDetail(place);
-              };
-            }
-          }, 100);
-        });
-
-        markersRef.current.push(marker);
-      });
-    }
-  };
-
   useEffect(() => {
     if (isLightMode) document.documentElement.classList.add('light-mode');
     else document.documentElement.classList.remove('light-mode');
@@ -645,7 +484,7 @@ export default function App() {
         name: 'Tamil Nadu',
         description: 'Showing all destinations across Tamil Nadu',
         places: allPlaces,
-        coordinates: { lat: 10.7905, lng: 78.7047 } // Center of Tamil Nadu
+        mapEmbedUrl: null // or general map
       });
       setPlace('Tamil Nadu');
     } else {
@@ -885,14 +724,17 @@ export default function App() {
                 </div>
               </div>
 
-              {mapView ? (
-                <div className="glass" style={{ height: '600px', padding: 0, overflow: 'hidden', borderRadius: '24px', position: 'relative' }}>
-                  <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
-                  {!window.google && (
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--text-muted)' }}>
-                      Loading Google Maps...
-                    </div>
-                  )}
+              {mapView && selectedData?.mapEmbedUrl ? (
+                <div className="glass" style={{ height: '600px', padding: '1rem', overflow: 'hidden', borderRadius: '24px' }}>
+                  <iframe
+                    src={selectedData.mapEmbedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, borderRadius: '16px' }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    title="District Map"
+                  ></iframe>
                 </div>
               ) : (
                 <>
@@ -1098,14 +940,26 @@ export default function App() {
           )}
 
           {/* Fallback/Other Screens (Cost, Weather - Placeholder logic from original, reused screen states) */}
-          {(screen === 'cost' || screen === 'weather') && (
-            <PageTransition key="other">
-              <div style={{ textAlign: 'center', padding: '5rem' }}>
-                <h2 style={{ color: 'var(--text)' }}>Feature Coming Soon</h2>
-                <button className="btn-secondary" onClick={() => setScreen('places')} style={{ marginTop: '2rem' }}>
-                  Go Back
-                </button>
-              </div>
+// ... imports at the top need to include the new components
+          // I will do imports in a separate replacement chunk for clarity and safety in locating lines.
+          // This chunk focuses on the render logic replacement.
+
+          {screen === 'cost' && (
+            <PageTransition key="cost">
+              <BudgetCalculator
+                initialDestination={place === 'Tamil Nadu' ? 'Chennai' : place}
+                initialDays={days}
+                onBack={() => setScreen('places')}
+              />
+            </PageTransition>
+          )}
+
+          {screen === 'weather' && (
+            <PageTransition key="weather">
+              <WeatherInfo
+                initialPlace={place === 'Tamil Nadu' ? 'Chennai' : place}
+                onBack={() => setScreen('places')}
+              />
             </PageTransition>
           )}
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Home, MapPin, DollarSign, CloudSun, Compass, Navigation, Zap, X, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, Heart, Tag, Search, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
@@ -71,7 +71,7 @@ const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
   </nav>
 );
 
-const Carousel = ({ images, activeIndex, name }) => {
+const Carousel = ({ images, name }) => {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -405,29 +405,17 @@ const Footer = ({ setScreen, setPlace, handleExplore }) => (
 
 // --- Main App Component ---
 
-const PageTransition = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-  >
-    {children}
-  </motion.div>
-);
+
 
 export default function App() {
-<<<<<<< HEAD
-=======
   const [screen, setScreen] = useState('home');
   const [place, setPlace] = useState('Chennai');
   const [days, setDays] = useState(3);
   const [selectedData, setSelectedData] = useState(null);
   const [selectedPlaceDetail, setSelectedPlaceDetail] = useState(null);
-  const [travelers, setTravelers] = useState(1);
   const [mapView, setMapView] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
-  const [maxBudget, setMaxBudget] = useState(50000);
+  const [, setMaxBudget] = useState(50000);
   const [favorites, setFavorites] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
@@ -515,7 +503,6 @@ export default function App() {
       setTimeout(() => setSearchAlert(null), 3000);
       return;
     }
->>>>>>> refs/remotes/origin/main
 
     const query = searchInput.toLowerCase();
 
@@ -593,31 +580,12 @@ export default function App() {
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
-                        if (searchQuery) {
-                          const matchedLocation = Object.keys(mockLocations).find(loc =>
-                            loc.toLowerCase().includes(searchQuery.toLowerCase())
-                          );
-                          if (matchedLocation) {
-                            setPlace(matchedLocation);
-                            handleExplore(matchedLocation);
-                          } else {
-                            // Optional: Handle no match specifically, for now just stay or maybe show alert?
-                            // But user requirement says "Handle empty input with validation message", so maybe handled in UI
-                          }
-                        } else {
-                          // Empty input handling
-                        }
+                        handleSearchCommit();
                       }}
                       style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}
                     >
                       <Search size={24} color="var(--primary)" />
                       <input
-<<<<<<< HEAD
-                        type="search"
-                        placeholder="Search destinations (e.g. Chennai, Ooty)..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-=======
                         type="text"
                         placeholder="Search destinations in Tamil Nadu..."
                         value={searchInput}
@@ -627,7 +595,6 @@ export default function App() {
                             handleSearchCommit();
                           }
                         }}
->>>>>>> refs/remotes/origin/main
                         style={{
                           flex: 1,
                           background: 'var(--glass-highlight)',
@@ -639,36 +606,21 @@ export default function App() {
                           outline: 'none',
                           borderRadius: '8px'
                         }}
-<<<<<<< HEAD
                         // inputMode="search" helps mobile keypads show 'Go' or 'Search'
                         inputMode="search"
                         enterKeyHint="search"
-=======
->>>>>>> refs/remotes/origin/main
                       />
                       <button
                         type="submit"
                         className="btn-primary"
                         style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
-<<<<<<< HEAD
                       >
                         Explore
                       </button>
                     </form>
-                    {/* Live Suggestion / No Match Feedback could go here if requested, currently focusing on stability */}
-                    {searchQuery && !Object.keys(mockLocations).some(loc => loc.toLowerCase().includes(searchQuery.toLowerCase())) && searchQuery.length > 2 && (
-                      <div style={{ padding: '0.5rem 0 0 3rem', color: 'var(--accent)', fontSize: '0.9rem' }}>
-                        Update: Destination not found. Try 'Chennai' or 'Ooty'.
-=======
-                        onClick={handleSearchCommit}
-                      >
-                        Explore
-                      </button>
-                    </div>
                     {searchAlert && (
                       <div style={{ marginTop: '0.8rem', color: 'var(--warning)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <AlertTriangle size={14} /> {searchAlert}
->>>>>>> refs/remotes/origin/main
                       </div>
                     )}
                   </div>
@@ -998,9 +950,7 @@ export default function App() {
           )}
 
           {/* Fallback/Other Screens (Cost, Weather - Placeholder logic from original, reused screen states) */}
-// ... imports at the top need to include the new components
-          // I will do imports in a separate replacement chunk for clarity and safety in locating lines.
-          // This chunk focuses on the render logic replacement.
+
 
           {screen === 'cost' && (
             <PageTransition key="cost">
@@ -1024,6 +974,6 @@ export default function App() {
         </AnimatePresence>
       </div>
       <Footer setScreen={setScreen} setPlace={setPlace} handleExplore={handleExplore} />
-    </div>
+    </div >
   );
 }

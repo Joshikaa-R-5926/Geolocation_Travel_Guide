@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { DollarSign, Users, Calendar, Calculator, RefreshCw, ArrowLeft, CheckCircle, PieChart } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo } from 'react';
+import { Users, Calendar, Calculator, ArrowLeft, PieChart } from 'lucide-react';
 
 const BudgetCalculator = ({ initialDestination, initialDays, onBack }) => {
     const [destination, setDestination] = useState(initialDestination || 'Chennai');
     const [days, setDays] = useState(initialDays || 3);
     const [travelers, setTravelers] = useState(1);
     const [style, setStyle] = useState('Moderate');
-    const [breakdown, setBreakdown] = useState(null);
 
     // Mock cost data per day per person (in INR)
     const costData = {
@@ -18,7 +16,7 @@ const BudgetCalculator = ({ initialDestination, initialDays, onBack }) => {
 
     const destinations = ['Chennai', 'Coimbatore', 'Madurai', 'Ooty', 'Kodaikanal', 'Kanyakumari', 'Rameswaram', 'Thanjavur'];
 
-    const calculateBudget = () => {
+    const breakdown = useMemo(() => {
         const costs = costData[style];
         const totalAccommodation = costs.accommodation * days * travelers;
         const totalFood = costs.food * days * travelers;
@@ -26,20 +24,14 @@ const BudgetCalculator = ({ initialDestination, initialDays, onBack }) => {
         const totalActivities = costs.activities * days * travelers;
         const total = totalAccommodation + totalFood + totalTransport + totalActivities;
 
-        setBreakdown({
+        return {
             accommodation: totalAccommodation,
             food: totalFood,
             transport: totalTransport,
             activities: totalActivities,
             total: total
-        });
-    };
-
-    useEffect(() => {
-        // Auto calculate on load if we have defaults, but maybe better to let user interact first
-        // or just calculate initially for immediate feedback
-        calculateBudget();
-    }, [destination, days, travelers, style]);
+        };
+    }, [days, travelers, style]);
 
     return (
         <div className="budget-calculator-container" style={{ padding: '2rem 0' }}>

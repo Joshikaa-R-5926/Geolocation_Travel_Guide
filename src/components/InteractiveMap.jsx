@@ -20,15 +20,15 @@ export const InteractiveMap = ({ center, places, onPlaceClick, apiKey }) => {
         googleMapsApiKey: apiKey
     });
 
-    const [map, setMap] = useState(null);
+
     const [selectedPlace, setSelectedPlace] = useState(null);
 
-    const onLoad = useCallback(function callback(map) {
-        setMap(map);
+    const onLoad = useCallback(function callback() {
+        // map ref could be stored here if needed
     }, []);
 
-    const onUnmount = useCallback(function callback(map) {
-        setMap(null);
+    const onUnmount = useCallback(function callback() {
+        // clean up
     }, []);
 
     if (loadError) {

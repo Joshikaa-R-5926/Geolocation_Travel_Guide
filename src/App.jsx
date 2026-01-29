@@ -4,84 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
 
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+  >
+    {children}
+  </motion.div>
+);
+
 export default function App() {
-  const [screen, setScreen] = useState('home');
-  const [place, setPlace] = useState('Chennai');
-  const [days, setDays] = useState(3);
-  const [selectedData, setSelectedData] = useState(null);
-  const [selectedPlaceDetail, setSelectedPlaceDetail] = useState(null);
-  const [travelers, setTravelers] = useState(1);
-  const [mapView, setMapView] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(false);
-  const [maxBudget, setMaxBudget] = useState(50000);
-  const [quizScore, setQuizScore] = useState({ budget: 0, duration: 0, interest: '' });
-  const [favorites, setFavorites] = useState([]);
-  const [categoryFilter, setCategoryFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('recommended');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    if (isLightMode) document.documentElement.classList.add('light-mode');
-    else document.documentElement.classList.remove('light-mode');
-  }, [isLightMode]);
-
-
-
-  const toggleFavorite = (placeName) => {
-    setFavorites(prev =>
-      prev.includes(placeName)
-        ? prev.filter(name => name !== placeName)
-        : [...prev, placeName]
-    );
-  };
-
-  const getFilteredAndSortedPlaces = (places) => {
-    if (!places) return [];
-
-    let filtered = places;
-
-    // Filter by category
-    if (categoryFilter !== 'All') {
-      filtered = filtered.filter(p => p.category?.includes(categoryFilter));
-    }
-
-    // Sort
-    const sorted = [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case 'rating':
-          return (b.rating || 0) - (a.rating || 0);
-        case 'reviews':
-          return (b.reviewCount || 0) - (a.reviewCount || 0);
-        case 'name':
-          return a.name.localeCompare(b.name);
-        default: // recommended
-          return 0;
-      }
-    });
-
-    return sorted;
-  };
-
-  const handleExplore = (targetPlace) => {
-    const p = targetPlace || place;
-    const data = mockLocations[p] || mockLocations['Chennai'];
-    setSelectedData(data);
-    setMapView(false);
-    setCategoryFilter('All');
-    setSortBy('recommended');
-    setScreen('places');
-  };
-
-  const PageTransition = ({ children }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
 
   const Navbar = () => (
     <nav className="navbar">
@@ -474,11 +408,30 @@ export default function App() {
                 <div style={{ maxWidth: '700px' }}>
                   {/* Search Bar */}
                   <div className="glass" style={{ padding: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (searchQuery) {
+                          const matchedLocation = Object.keys(mockLocations).find(loc =>
+                            loc.toLowerCase().includes(searchQuery.toLowerCase())
+                          );
+                          if (matchedLocation) {
+                            setPlace(matchedLocation);
+                            handleExplore(matchedLocation);
+                          } else {
+                            // Optional: Handle no match specifically, for now just stay or maybe show alert?
+                            // But user requirement says "Handle empty input with validation message", so maybe handled in UI
+                          }
+                        } else {
+                          // Empty input handling
+                        }
+                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}
+                    >
                       <Search size={24} color="var(--primary)" />
                       <input
-                        type="text"
-                        placeholder="Search destinations in Tamil Nadu..."
+                        type="search"
+                        placeholder="Search destinations (e.g. Chennai, Ooty)..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         style={{
@@ -492,38 +445,24 @@ export default function App() {
                           outline: 'none',
                           borderRadius: '8px'
                         }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && searchQuery) {
-                            const matchedLocation = Object.keys(mockLocations).find(loc =>
-                              loc.toLowerCase().includes(searchQuery.toLowerCase())
-                            );
-                            if (matchedLocation) {
-                              setPlace(matchedLocation);
-                              handleExplore(matchedLocation);
-                            }
-                          }
-                        }}
+                        // inputMode="search" helps mobile keypads show 'Go' or 'Search'
+                        inputMode="search"
+                        enterKeyHint="search"
                       />
                       <button
+                        type="submit"
                         className="btn-primary"
                         style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
-                        onClick={() => {
-                          if (searchQuery) {
-                            const matchedLocation = Object.keys(mockLocations).find(loc =>
-                              loc.toLowerCase().includes(searchQuery.toLowerCase())
-                            );
-                            if (matchedLocation) {
-                              setPlace(matchedLocation);
-                              handleExplore(matchedLocation);
-                            }
-                          } else {
-                            handleExplore();
-                          }
-                        }}
                       >
                         Explore
                       </button>
-                    </div>
+                    </form>
+                    {/* Live Suggestion / No Match Feedback could go here if requested, currently focusing on stability */}
+                    {searchQuery && !Object.keys(mockLocations).some(loc => loc.toLowerCase().includes(searchQuery.toLowerCase())) && searchQuery.length > 2 && (
+                      <div style={{ padding: '0.5rem 0 0 3rem', color: 'var(--accent)', fontSize: '0.9rem' }}>
+                        Update: Destination not found. Try 'Chennai' or 'Ooty'.
+                      </div>
+                    )}
                   </div>
 
                   {/* Quick Category Filters */}

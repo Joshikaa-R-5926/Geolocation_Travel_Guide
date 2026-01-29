@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react';
+import { Home, MapPin, DollarSign, CloudSun, ChevronRight, Compass, Navigation, Zap, X, Info, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, CheckCircle, Heart, Share2, Clock, Tag, Search, Filter, Users, Calendar as CalendarIcon, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Github, TreePine } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
@@ -72,7 +72,33 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const [notification, setNotification] = useState(null);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const lowerQuery = searchQuery.toLowerCase().trim();
+    const newSuggestions = [];
+
+    Object.entries(mockLocations).forEach(([key, data]) => {
+      // District Match
+      if (key.toLowerCase().includes(lowerQuery)) {
+        newSuggestions.push({ type: 'District', name: key });
+      }
+      // Places Match
+      data.places.forEach(p => {
+        if (p.name.toLowerCase().includes(lowerQuery)) {
+          newSuggestions.push({ type: 'Place', name: p.name, district: key });
+        }
+      });
+    });
+
+    setSuggestions(newSuggestions.slice(0, 5)); // Limit to 5 suggestions
+  }, [searchQuery]);
 
   const showNotification = (msg) => {
     setNotification(msg);
@@ -123,17 +149,13 @@ export default function App() {
 
   const handleExplore = (targetInput) => {
     let match = null;
+    const queryToUse = targetInput || searchQuery;
 
-    // 1. If a specific target is passed (e.g. from quiz or quick link), use it directly if it's a known district
-    if (targetInput && mockLocations[targetInput]) {
-      match = { type: 'district', districtKey: targetInput };
+    if (queryToUse) {
+      match = findSearchMatch(queryToUse);
     }
-    // 2. Use search query if available
-    else if (searchQuery) {
-      match = findSearchMatch(searchQuery);
-    }
-    // 3. Fallback to current default 'place' if valid and no search query
-    else if (!searchQuery && place && mockLocations[place]) {
+    // Fallback to current default 'place' if valid and no search query
+    else if (!queryToUse && place && mockLocations[place]) {
       match = { type: 'district', districtKey: place };
     }
 
@@ -141,6 +163,9 @@ export default function App() {
       showNotification("Result not found. Try another destination!");
       return;
     }
+
+    setSuggestions([]); // Clear suggestions logic
+    if (targetInput) setSearchQuery(targetInput); // Update input to match selection
 
     // Apply Logic
     if (match.type === 'district') {
@@ -567,30 +592,82 @@ export default function App() {
                 <div style={{ maxWidth: '700px' }}>
                   {/* Search Bar */}
                   <div className="glass" style={{ padding: '1rem', marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}>
                       <Search size={24} color="var(--primary)" />
-                      <input
-                        type="text"
-                        placeholder="Search destinations in Tamil Nadu..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{
-                          flex: 1,
-                          background: 'rgba(255,255,255,0.05)',
-                          border: 'none',
-                          padding: '0.75rem 1rem',
-                          fontSize: '1.1rem',
-                          color: 'white',
-                          fontWeight: 500,
-                          outline: 'none',
-                          borderRadius: '8px'
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleExplore();
-                          }
-                        }}
-                      />
+                      <div style={{ flex: 1, position: 'relative' }}>
+                        <input
+                          type="text"
+                          placeholder="Search destinations in Tamil Nadu..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          style={{
+                            width: '100%',
+                            background: 'rgba(255,255,255,0.05)',
+                            border: 'none',
+                            padding: '0.75rem 1rem',
+                            fontSize: '1.1rem',
+                            color: 'white',
+                            fontWeight: 500,
+                            outline: 'none',
+                            borderRadius: '8px'
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleExplore();
+                            }
+                          }}
+                        />
+                        {/* Search Suggestions Dropdown */}
+                        <AnimatePresence>
+                          {suggestions.length > 0 && (
+                            <motion.ul
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                background: 'rgba(20, 20, 30, 0.95)',
+                                backdropFilter: 'blur(10px)',
+                                borderRadius: '0 0 12px 12px',
+                                marginTop: '5px',
+                                padding: '0.5rem 0',
+                                listStyle: 'none',
+                                zIndex: 100,
+                                border: '1px solid var(--glass-border)',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                              }}
+                            >
+                              {suggestions.map((s, i) => (
+                                <li
+                                  key={i}
+                                  onClick={() => handleExplore(s.name)}
+                                  style={{
+                                    padding: '0.75rem 1.5rem',
+                                    cursor: 'pointer',
+                                    borderBottom: i !== suggestions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    color: 'white',
+                                    transition: 'background 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    {s.type === 'District' ? <MapPin size={16} color="var(--primary)" /> : <TreePine size={16} color="var(--accent)" />}
+                                    <span>{s.name}</span>
+                                  </div>
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.type}</span>
+                                </li>
+                              ))}
+                            </motion.ul>
+                          )}
+                        </AnimatePresence>
+                      </div>
                       <button
                         className="btn-primary"
                         style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}

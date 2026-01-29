@@ -4,6 +4,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
 
+// --- Helper for Global Search ---
+const getAllPlaces = () => {
+  const allPlaces = [];
+  Object.entries(mockLocations).forEach(([districtName, data]) => {
+    if (data.places) {
+      // Add district name to each place for context
+      const placesWithDistrict = data.places.map(p => ({
+        ...p,
+        district: districtName,
+        // Ensure image fallback exists
+        image: p.image || IMG.HERITAGE
+      }));
+      allPlaces.push(...placesWithDistrict);
+    }
+  });
+  return allPlaces;
+};
+
 // --- Top-Level Components to prevent re-mounting ---
 
 const PageTransition = ({ children }) => (
@@ -161,6 +179,12 @@ const DetailModal = ({ place, onClose }) => (
         <p style={{ fontSize: '1.2rem', color: 'var(--text)', opacity: 0.9, lineHeight: '1.6', marginBottom: '2.5rem' }}>
           {(place?.longDescription || place?.description) ? (place.longDescription || place.description + " Experience the rich heritage and scenic beauty of this remarkable destination in Tamil Nadu.") : "Loading description..."}
         </p>
+
+        {place?.district && (
+          <div style={{ display: 'inline-block', padding: '4px 12px', background: 'var(--primary)', color: 'white', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', marginBottom: '2rem' }}>
+            📍 {place.district}
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
           <div className="glass" style={{ padding: '1.5rem', background: 'var(--glass-highlight)' }}>
@@ -389,7 +413,6 @@ export default function App() {
   const [mapView, setMapView] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
   const [maxBudget, setMaxBudget] = useState(50000);
-  const [quizScore, setQuizScore] = useState({ budget: 0, duration: 0, interest: '' });
   const [favorites, setFavorites] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
@@ -438,18 +461,36 @@ export default function App() {
     return sorted;
   };
 
-  const handleExplore = (targetPlace) => {
-    const p = targetPlace || place;
-    // Basic search/lookup logic
-    // We check if we have data for this place or fallback to Chennai
-    const data = mockLocations[p] || mockLocations['Chennai'];
-
-    // Update state to show places
-    setSelectedData(data);
-    setMapView(false);
-    setCategoryFilter('All');
-    setSortBy('recommended');
+  const handleExplore = (targetPlace, filterCategory = null) => {
     setScreen('places');
+    setSortBy('recommended');
+    setMapView(false);
+
+    if (filterCategory) {
+      setCategoryFilter(filterCategory);
+      // If a specific category is requested from Home, we go Global by default
+      targetPlace = 'Tamil Nadu';
+    } else {
+      // If Just "Explore" is clicked without specific category, we use "All"
+      setCategoryFilter('All');
+    }
+
+    // Handle Global View
+    if (targetPlace === 'Tamil Nadu') {
+      const allPlaces = getAllPlaces();
+      setSelectedData({
+        name: 'Tamil Nadu',
+        description: 'Showing all destinations across Tamil Nadu',
+        places: allPlaces,
+        mapEmbedUrl: null // or general map
+      });
+      setPlace('Tamil Nadu');
+    } else {
+      const p = targetPlace || place;
+      const data = mockLocations[p] || mockLocations['Chennai'];
+      setSelectedData(data);
+      setPlace(p);
+    }
   };
 
   // Improved Search Logic
@@ -466,9 +507,8 @@ export default function App() {
     );
 
     if (matchedLocation) {
-      setPlace(matchedLocation);
       handleExplore(matchedLocation);
-      setSearchInput(''); // clear input after search or keep it? user preference. clearing is safer.
+      setSearchInput('');
     } else {
       setSearchAlert(`No guide found for "${searchInput}". Try Chennai, Ooty, or Madurai.`);
       setTimeout(() => setSearchAlert(null), 3000);
@@ -495,7 +535,7 @@ export default function App() {
                     From the mist-covered peaks of the Western Ghats to the ancient stone carvings of Mahabalipuram, embark on a journey through India's cultural heartland.
                   </p>
                   <div style={{ display: 'flex', gap: '1.5rem' }}>
-                    <button className="btn-primary" onClick={() => handleExplore()}>
+                    <button className="btn-primary" onClick={() => handleExplore('Tamil Nadu')}>
                       Start Journey <Navigation size={20} />
                     </button>
                   </div>
@@ -563,9 +603,8 @@ export default function App() {
                           whileHover={{ scale: 1.05, y: -4 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
-                            setCategoryFilter(category.value);
-                            setPlace('Chennai');
-                            handleExplore('Chennai');
+                            // Global filtering - switch to global view
+                            handleExplore('Tamil Nadu', category.value);
                           }}
                           style={{
                             padding: '1.5rem 1rem',
@@ -624,8 +663,17 @@ export default function App() {
               </div>
               <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                  <h2 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', color: 'var(--text)' }}>{selectedData?.name}</h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Curated experiences for your {days}-day venture</p>
+                  <h2 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', color: 'var(--text)' }}>
+                    {place === 'Tamil Nadu' && categoryFilter !== 'All'
+                      ? `All ${categoryFilter}s`
+                      : selectedData?.name}
+                  </h2>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
+                    {place === 'Tamil Nadu'
+                      ? `Explore ${categoryFilter === 'All' ? 'all' : categoryFilter.toLowerCase()} destinations across Tamil Nadu`
+                      : `Curated experiences for your ${days}-day venture`
+                    }
+                  </p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                   {selectedData?.mapEmbedUrl && (
@@ -666,7 +714,19 @@ export default function App() {
                       {['All', 'Temple', 'Beach', 'Hill Station', 'Heritage', 'Nature'].map(cat => (
                         <button
                           key={cat}
-                          onClick={() => setCategoryFilter(cat)}
+                          onClick={() => {
+                            // If they click a category in Places view, we switch to Global Search Context
+                            // EXCEPT if they are viewing a specific District, they might want to just filter that district.
+                            // Requirements: "Category tabs should act as GLOBAL filters"
+
+                            if (cat === 'All' && place !== 'Tamil Nadu') {
+                              // "All" keeps us in current district, just resets filter
+                              setCategoryFilter('All');
+                            } else {
+                              // Any specific category click -> Switch to Global View of that category
+                              handleExplore('Tamil Nadu', cat);
+                            }
+                          }}
                           className={categoryFilter === cat ? 'filter-btn active' : 'filter-btn'}
                           style={{
                             padding: '0.5rem 1rem',
@@ -684,16 +744,24 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', color: 'var(--text)' }}
-                    >
-                      <option value="recommended">Recommended</option>
-                      <option value="rating">Highest Rated</option>
-                      <option value="reviews">Most Reviewed</option>
-                      <option value="name">Alphabetical</option>
-                    </select>
+
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      {place === 'Tamil Nadu' && (
+                        <div style={{ fontSize: '0.9rem', color: 'var(--accent)', fontWeight: 600 }}>
+                          Global View
+                        </div>
+                      )}
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                        style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem', color: 'var(--text)' }}
+                      >
+                        <option value="recommended">Recommended</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="reviews">Most Reviewed</option>
+                        <option value="name">Alphabetical</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Places List */}
@@ -784,9 +852,16 @@ export default function App() {
 
                         {/* Content */}
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                          <div>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text)' }}>{p.name}</h3>
-                            <StarRating rating={p.rating} reviewCount={p.reviewCount} />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text)' }}>{p.name}</h3>
+                              <StarRating rating={p.rating} reviewCount={p.reviewCount} />
+                            </div>
+                            {p.district && (
+                              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'var(--glass-highlight)', padding: '4px 10px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                                {p.district}
+                              </div>
+                            )}
                           </div>
 
                           {/* Categories */}

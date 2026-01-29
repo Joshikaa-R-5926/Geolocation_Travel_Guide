@@ -4,6 +4,59 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
 
+const findSearchMatch = (query) => {
+  if (!query) return null;
+  const lowerQuery = query.toLowerCase().trim();
+
+  // 1. Direct District Match (Exact)
+  const exactDistrict = Object.keys(mockLocations).find(key => key.toLowerCase() === lowerQuery);
+  if (exactDistrict) return { type: 'district', districtKey: exactDistrict };
+
+  // 2. Search through all data
+  for (const [key, data] of Object.entries(mockLocations)) {
+    // Partial District Name Match
+    if (key.toLowerCase().includes(lowerQuery)) {
+      return { type: 'district', districtKey: key };
+    }
+    // Place Name Match
+    const placeMatch = data.places.find(p => p.name.toLowerCase().includes(lowerQuery));
+    if (placeMatch) {
+      return { type: 'place', districtKey: key, placeData: placeMatch };
+    }
+  }
+  return null;
+};
+
+const Toast = ({ message, onClose }) => (
+  <motion.div
+    initial={{ opacity: 0, y: -50, x: '-50%' }}
+    animate={{ opacity: 1, y: 20, x: '-50%' }}
+    exit={{ opacity: 0, y: -50, x: '-50%' }}
+    style={{
+      position: 'fixed',
+      top: '0',
+      left: '50%',
+      zIndex: 1000,
+      background: 'rgba(220, 38, 38, 0.9)',
+      color: 'white',
+      padding: '1rem 2rem',
+      borderRadius: '30px',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 10px 30px rgba(220, 38, 38, 0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontWeight: 600
+    }}
+  >
+    <AlertTriangle size={20} />
+    {message}
+    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', marginLeft: '10px', cursor: 'pointer' }}>
+      <X size={18} />
+    </button>
+  </motion.div>
+);
+
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [place, setPlace] = useState('Chennai');
@@ -19,6 +72,12 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
   const [searchQuery, setSearchQuery] = useState('');
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (msg) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     if (isLightMode) document.documentElement.classList.add('light-mode');
@@ -62,14 +121,45 @@ export default function App() {
     return sorted;
   };
 
-  const handleExplore = (targetPlace) => {
-    const p = targetPlace || place;
-    const data = mockLocations[p] || mockLocations['Chennai'];
-    setSelectedData(data);
-    setMapView(false);
-    setCategoryFilter('All');
-    setSortBy('recommended');
-    setScreen('places');
+  const handleExplore = (targetInput) => {
+    let match = null;
+
+    // 1. If a specific target is passed (e.g. from quiz or quick link), use it directly if it's a known district
+    if (targetInput && mockLocations[targetInput]) {
+      match = { type: 'district', districtKey: targetInput };
+    }
+    // 2. Use search query if available
+    else if (searchQuery) {
+      match = findSearchMatch(searchQuery);
+    }
+    // 3. Fallback to current default 'place' if valid and no search query
+    else if (!searchQuery && place && mockLocations[place]) {
+      match = { type: 'district', districtKey: place };
+    }
+
+    if (!match) {
+      showNotification("Result not found. Try another destination!");
+      return;
+    }
+
+    // Apply Logic
+    if (match.type === 'district') {
+      setPlace(match.districtKey);
+      setSelectedData(mockLocations[match.districtKey]);
+      setMapView(false);
+      setCategoryFilter('All');
+      setSortBy('recommended');
+      setScreen('places');
+      setSelectedPlaceDetail(null); // Clear any previous modal
+    } else if (match.type === 'place') {
+      setPlace(match.districtKey);
+      setSelectedData(mockLocations[match.districtKey]);
+      setMapView(false);
+      setCategoryFilter('All');
+      setSortBy('recommended');
+      setScreen('places');
+      setTimeout(() => setSelectedPlaceDetail(match.placeData), 100); // Slight delay for smooth transition
+    }
   };
 
   const PageTransition = ({ children }) => (
@@ -446,6 +536,9 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar />
+      <AnimatePresence>
+        {notification && <Toast message={notification} onClose={() => setNotification(null)} />}
+      </AnimatePresence>
       <div className="container">
         <AnimatePresence mode="wait">
           {screen === 'home' && (
@@ -492,34 +585,16 @@ export default function App() {
                           outline: 'none',
                           borderRadius: '8px'
                         }}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && searchQuery) {
-                            const matchedLocation = Object.keys(mockLocations).find(loc =>
-                              loc.toLowerCase().includes(searchQuery.toLowerCase())
-                            );
-                            if (matchedLocation) {
-                              setPlace(matchedLocation);
-                              handleExplore(matchedLocation);
-                            }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleExplore();
                           }
                         }}
                       />
                       <button
                         className="btn-primary"
                         style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
-                        onClick={() => {
-                          if (searchQuery) {
-                            const matchedLocation = Object.keys(mockLocations).find(loc =>
-                              loc.toLowerCase().includes(searchQuery.toLowerCase())
-                            );
-                            if (matchedLocation) {
-                              setPlace(matchedLocation);
-                              handleExplore(matchedLocation);
-                            }
-                          } else {
-                            handleExplore();
-                          }
-                        }}
+                        onClick={() => handleExplore()}
                       >
                         Explore
                       </button>

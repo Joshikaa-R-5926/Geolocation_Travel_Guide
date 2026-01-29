@@ -8,22 +8,50 @@ const findSearchMatch = (query) => {
   if (!query) return null;
   const lowerQuery = query.toLowerCase().trim();
 
-  // 1. Direct District Match (Exact)
+  // 1. Direct District Match (Exact/Close)
   const exactDistrict = Object.keys(mockLocations).find(key => key.toLowerCase() === lowerQuery);
   if (exactDistrict) return { type: 'district', districtKey: exactDistrict };
 
-  // 2. Search through all data
+  // 2. Direct Place Match (Exact)
   for (const [key, data] of Object.entries(mockLocations)) {
-    // Partial District Name Match
-    if (key.toLowerCase().includes(lowerQuery)) {
-      return { type: 'district', districtKey: key };
-    }
-    // Place Name Match
-    const placeMatch = data.places.find(p => p.name.toLowerCase().includes(lowerQuery));
-    if (placeMatch) {
-      return { type: 'place', districtKey: key, placeData: placeMatch };
-    }
+    const placeMatch = data.places.find(p => p.name.toLowerCase() === lowerQuery);
+    if (placeMatch) return { type: 'place', districtKey: key, placeData: placeMatch };
   }
+
+  // 3. Broad Search (Aggregated Results)
+  const aggregatedPlaces = [];
+  Object.entries(mockLocations).forEach(([key, data]) => {
+    data.places.forEach(p => {
+      // Match Name OR Category
+      const isNameMatch = p.name.toLowerCase().includes(lowerQuery);
+      const isCategoryMatch = p.category && p.category.some(cat => cat.toLowerCase().includes(lowerQuery));
+
+      if (isNameMatch || isCategoryMatch) {
+        aggregatedPlaces.push({ ...p, _district: key }); // Keep track of origin
+      }
+    });
+  });
+
+  if (aggregatedPlaces.length > 0) {
+    if (aggregatedPlaces.length === 1) {
+      // If only one result, treat as specific place
+      return { type: 'place', districtKey: aggregatedPlaces[0]._district, placeData: aggregatedPlaces[0] };
+    }
+    return {
+      type: 'virtual',
+      data: {
+        name: `Results for "${query}"`,
+        description: `Found ${aggregatedPlaces.length} destinations matching your search.`,
+        places: aggregatedPlaces,
+        weather: { temp: 28, condition: 'Varied', forecast: [] } // Dummy weather
+      }
+    };
+  }
+
+  // 4. Partial District Fallback
+  const partialDistrict = Object.keys(mockLocations).find(key => key.toLowerCase().includes(lowerQuery));
+  if (partialDistrict) return { type: 'district', districtKey: partialDistrict };
+
   return null;
 };
 
@@ -175,7 +203,7 @@ export default function App() {
       setCategoryFilter('All');
       setSortBy('recommended');
       setScreen('places');
-      setSelectedPlaceDetail(null); // Clear any previous modal
+      setSelectedPlaceDetail(null);
     } else if (match.type === 'place') {
       setPlace(match.districtKey);
       setSelectedData(mockLocations[match.districtKey]);
@@ -183,7 +211,14 @@ export default function App() {
       setCategoryFilter('All');
       setSortBy('recommended');
       setScreen('places');
-      setTimeout(() => setSelectedPlaceDetail(match.placeData), 100); // Slight delay for smooth transition
+      setTimeout(() => setSelectedPlaceDetail(match.placeData), 100);
+    } else if (match.type === 'virtual') {
+      setSelectedData(match.data);
+      setMapView(false);
+      setCategoryFilter('All');
+      setSortBy('recommended');
+      setScreen('places');
+      setSelectedPlaceDetail(null);
     }
   };
 
@@ -597,9 +632,11 @@ export default function App() {
                       <div style={{ flex: 1, position: 'relative' }}>
                         <input
                           type="text"
-                          placeholder="Search destinations in Tamil Nadu..."
+                          placeholder="Search places, districts, or themes..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
+                          onFocus={() => setIsSearchFocused(true)}
+                          onBlur={() => setTimeout(() => setIsSearchFocused(false), 100)}
                           style={{
                             width: '100%',
                             background: 'rgba(255,255,255,0.05)',

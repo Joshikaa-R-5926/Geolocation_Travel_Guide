@@ -64,6 +64,7 @@ const enhancePlaces = (places) => {
 export const mockLocations = {
     Ariyalur: {
         name: 'Ariyalur',
+        coordinates: { lat: 11.1401, lng: 79.0786 },
         places: [
             { name: 'GANGAIKONDA CHOLAPURAM', description: 'UNESCO heritage site with stunning Chola architecture and the massive Brihadisvara Temple.', image: '/assets/images/ariyalur/gangaikonda.png' },
             { name: 'Chola Ganga Lake (Ponneri Lake)', description: 'Historic reservoir and scenic lake built by the Chola dynasty, also known as Ponneri.', image: '/assets/images/ariyalur/cholaganga.jpg' },
@@ -74,6 +75,7 @@ export const mockLocations = {
     },
     Chengalpattu: {
         name: 'Chengalpattu',
+        coordinates: { lat: 12.6961, lng: 79.9723 },
         places: [
             { name: 'Arignar Anna Zoological Park', description: 'One of the largest zoological parks in South Asia, popular for its lion and night safari.', image: '/assets/images/chengalpattu/vandalur_zoo.jpg' },
             { name: 'Muttukadu Boat House', description: 'Scenic backwater destination offering rowing, windsurfing, and water skiing.', image: '/assets/images/chengalpattu/muttukadu.jpg' },
@@ -193,6 +195,7 @@ export const mockLocations = {
     },
     Cuddalore: {
         name: 'Cuddalore',
+        coordinates: { lat: 11.7480, lng: 79.7714 },
         places: [
             { name: 'Silver Beach', description: 'The second longest beach in the Coromandel Coast.', image: IMG.BEACH },
             { name: 'Devanampattinam Beach', description: 'Popular local beach with recreational activities.', image: IMG.BEACH },
@@ -205,6 +208,7 @@ export const mockLocations = {
     },
     Dharmapuri: {
         name: 'Dharmapuri',
+        coordinates: { lat: 12.1211, lng: 78.1582 },
         places: [
             { name: 'Hogenakkal Falls', description: 'Known as the "Niagara of India," famous for its coracle rides and medicinal baths.', image: '/assets/images/dharmapuri/hogenakkal.jpg' },
             { name: 'Theerthamalai Temple', description: 'Ancient temple dedicated to Shiva, situated on a hill with sacred springs.', image: '/assets/images/dharmapuri/theerthamalai.jpg' },
@@ -221,6 +225,7 @@ export const mockLocations = {
     },
     Dindigul: {
         name: 'Dindigul',
+        coordinates: { lat: 10.3673, lng: 77.9803 },
         places: [
             { name: 'Kodaikanal', description: 'The princess of hill stations, part of Dindigul district.', image: IMG.HILL },
             { name: 'Sirumalai Hills', description: 'Lush hill station known for its unique climate.', image: IMG.HILL },
@@ -233,6 +238,7 @@ export const mockLocations = {
     },
     Erode: {
         name: 'Erode',
+        coordinates: { lat: 11.3410, lng: 77.7172 },
         places: [
             { name: 'Bhavani Sangameshwarar Temple', description: 'Sacred confluence of three holy rivers.', image: IMG.TEMPLE },
             { name: 'Kodiveri Dam', description: 'Beautiful waterfall and public bathing site.', image: 'https://images.unsplash.com/photo-1590424072237-7f938f3883a9?auto=format&fit=crop&q=80&w=800' },
@@ -245,6 +251,7 @@ export const mockLocations = {
     },
     Kallakurichi: {
         name: 'Kallakurichi',
+        coordinates: { lat: 11.7384, lng: 78.9631 },
         places: [
             { name: 'Kalvarayan Hills', description: 'Beautiful range of hills in Eastern Ghats with waterfalls.', image: IMG.HILL },
             { name: 'Gomuki Dam', description: 'Scenic dam and picnic spot at the foot of the hills.', image: IMG.FOREST },
@@ -257,6 +264,7 @@ export const mockLocations = {
     },
     Kanchipuram: {
         name: 'Kanchipuram',
+        coordinates: { lat: 12.8342, lng: 79.7036 },
         places: [
             { name: 'Ekambareswarar Temple', description: 'Ancient temple representing the element of Earth.', image: IMG.TEMPLE },
             { name: 'Kamakshi Amman Temple', description: 'Golden temple of the city of temples.', image: IMG.TEMPLE },
@@ -269,6 +277,7 @@ export const mockLocations = {
     },
     Kanyakumari: {
         name: 'Kanyakumari',
+        coordinates: { lat: 8.0883, lng: 77.5385 },
         places: [
             { name: 'Vivekananda Rock Memorial', description: 'Iconic monument on a rock in the middle of the sea.', image: 'https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=800' },
             { name: 'Thiruvalluvar Statue', description: '133ft tall stone statue representing the legendary poet.', image: IMG.BEACH },
@@ -282,6 +291,7 @@ export const mockLocations = {
     },
     Karur: {
         name: 'Karur',
+        coordinates: { lat: 10.9601, lng: 78.0766 },
         places: [
             { name: 'Pasupathieswarar Temple', description: 'Ancient Shiva temple known for its architecture.', image: IMG.TEMPLE },
             { name: 'Amaravathi River', description: 'Explore the serene banks of the river.', image: IMG.FOREST },
@@ -293,6 +303,7 @@ export const mockLocations = {
     },
     Kodaikanal: {
         name: 'Kodaikanal',
+        coordinates: { lat: 10.2381, lng: 77.4892 },
         places: [
             { name: 'Kodaikanal Lake', description: 'Star-shaped lake perfect for serene walks and boating.', image: IMG.HILL },
             { name: 'Coaker’s Walk', description: 'Scenic pedestrian path with breathtaking valley views.', image: IMG.HILL },
@@ -335,6 +346,7 @@ export const mockLocations = {
     },
     Madurai: {
         name: 'Madurai',
+        coordinates: { lat: 9.9252, lng: 78.1198 },
         places: [
             { name: 'Meenakshi Amman Temple', description: 'Ancient architectural marvel with 14 gopurams.', image: 'https://images.unsplash.com/photo-1616489953149-83bc9103c080?auto=format&fit=crop&q=80&w=800' },
             { name: 'Thirumalai Nayakkar Palace', description: 'Grand 17th-century royal palace with massive pillars.', image: IMG.HERITAGE },
@@ -348,6 +360,7 @@ export const mockLocations = {
     },
     Mayiladuthurai: {
         name: 'Mayiladuthurai',
+        coordinates: { lat: 11.1075, lng: 79.6524 },
         places: [
             { name: 'Mayuranathaswami Temple', description: 'Ancient Shiva temple known for its peacock legend.', image: IMG.TEMPLE },
             { name: 'Parimala Ranganathar Temple', description: 'One of the 108 Divya Desams of Lord Vishnu.', image: IMG.TEMPLE },
@@ -359,6 +372,7 @@ export const mockLocations = {
     },
     Nagapattinam: {
         name: 'Nagapattinam',
+        coordinates: { lat: 10.7672, lng: 79.8436 },
         places: [
             { name: 'Velankanni Basilica', description: 'World-famous shrine dedicated to Our Lady of Good Health.', image: IMG.HERITAGE },
             { name: 'Nagore Dargah', description: 'Historic 500-year-old spiritual site of Saint Shahul Hamid.', image: IMG.HERITAGE },
@@ -371,6 +385,7 @@ export const mockLocations = {
     },
     Namakkal: {
         name: 'Namakkal',
+        coordinates: { lat: 11.2148, lng: 78.1702 },
         places: [
             { name: 'Namakkal Fort', description: 'Hill fort built by the Madurai Nayaks in the 17th century.', image: IMG.HERITAGE },
             { name: 'Anjaneyar Temple', description: 'Famous for the 18ft tall single stone Hanuman statue.', image: IMG.TEMPLE },
@@ -383,6 +398,7 @@ export const mockLocations = {
     },
     Nilgiris: {
         name: 'Nilgiris',
+        coordinates: { lat: 11.4916, lng: 76.7337 },
         places: [
             { name: 'Ooty', description: 'The Queen of Hill Stations set in the Blue Mountains.', image: IMG.HILL },
             { name: 'Coonoor', description: 'Known for its tea estates and Sim\'s Park botanical garden.', image: IMG.HILL },
@@ -396,6 +412,7 @@ export const mockLocations = {
     },
     Ooty: {
         name: 'Ooty',
+        coordinates: { lat: 11.4102, lng: 76.6950 },
         places: [
             { name: 'Botanical Garden', description: 'Heritage gardens established in 1848 with rare species.', image: IMG.FOREST },
             { name: 'Ooty Lake', description: 'Artificial lake offering scenic boat rides since 1824.', image: IMG.HILL },
@@ -409,6 +426,7 @@ export const mockLocations = {
     },
     Perambalur: {
         name: 'Perambalur',
+        coordinates: { lat: 11.2291, lng: 78.8758 },
         places: [
             { name: 'Ranjankudi Fort', description: '17th-century strategic fort built by the Nawab of Carnatic.', image: IMG.HERITAGE },
             { name: 'Visuvasapuri Dam', description: 'Local scenic spot and important irrigation reservoir.', image: IMG.FOREST },
@@ -421,6 +439,7 @@ export const mockLocations = {
     },
     Pudukkottai: {
         name: 'Pudukkottai',
+        coordinates: { lat: 10.3833, lng: 78.8001 },
         places: [
             { name: 'Thirumayam Fort', description: 'Massive 17th-century bastion with panoramic views.', image: IMG.HERITAGE },
             { name: 'Sittanavasal Caves', description: 'Ancient Jain rock-cut cave paintings and beds.', image: IMG.HERITAGE },
@@ -433,6 +452,7 @@ export const mockLocations = {
     },
     Ramanathapuram: {
         name: 'Ramanathapuram',
+        coordinates: { lat: 9.3639, lng: 78.8385 },
         places: [
             { name: 'Rameswaram Temple', description: 'One of the holiest Jyotirlinga shrines located on an island.', image: IMG.TEMPLE },
             { name: 'Dhanushkodi', description: 'Ghost town at the tip of India where the two oceans meet.', image: IMG.BEACH },
@@ -445,6 +465,7 @@ export const mockLocations = {
     },
     Ranipet: {
         name: 'Ranipet',
+        coordinates: { lat: 12.9248, lng: 79.3197 },
         places: [
             { name: 'Ratnagiri Murugan Temple', description: 'Ancient hilltop temple with exceptional spiritual energy.', image: IMG.HILL },
             { name: 'Yelagiri Hills', description: 'Serene hill station known for its orchards and roses (nearby).', image: IMG.HILL },
@@ -456,6 +477,7 @@ export const mockLocations = {
     },
     Salem: {
         name: 'Salem',
+        coordinates: { lat: 11.6643, lng: 78.1460 },
         places: [
             { name: 'Yercaud', description: 'The "Poor Man\'s Ooty" known for its lake and coffee estates.', image: IMG.HILL },
             { name: 'Mettur Dam', description: 'One of the largest dams in India on the Kaveri river.', image: IMG.FOREST },
@@ -468,6 +490,7 @@ export const mockLocations = {
     },
     Sivaganga: {
         name: 'Sivaganga',
+        coordinates: { lat: 9.8700, lng: 78.5000 },
         places: [
             { name: 'Chettinad Palace', description: 'Stunning example of unique architecture and fine woodwork.', image: IMG.HERITAGE },
             { name: 'Pillayarpatti Temple', description: '6th-century rock-cut temple dedicated to Lord Ganesha.', image: IMG.TEMPLE },
@@ -480,6 +503,7 @@ export const mockLocations = {
     },
     Tenkasi: {
         name: 'Tenkasi',
+        coordinates: { lat: 8.9594, lng: 77.3095 },
         places: [
             { name: 'Courtallam Main Falls', description: 'The "Spa of South India" known for its medicinal waters.', image: IMG.FOREST },
             { name: 'Five Falls', description: 'Five separate cascades falling side by side in Courtallam.', image: IMG.FOREST },
@@ -492,6 +516,7 @@ export const mockLocations = {
     },
     Thanjavur: {
         name: 'Thanjavur',
+        coordinates: { lat: 10.7870, lng: 79.1378 },
         places: [
             { name: 'Brihadeeswarar Temple', description: 'UNESCO world heritage Big Temple built by Raja Raja Chola.', image: 'https://images.unsplash.com/photo-1616489953149-83bc9103c080?auto=format&fit=crop&q=80&w=800' },
             { name: 'Thanjavur Palace', description: 'Historic residence of the Nayak and Maratha kings.', image: IMG.HERITAGE },
@@ -504,6 +529,7 @@ export const mockLocations = {
     },
     Theni: {
         name: 'Theni',
+        coordinates: { lat: 10.0456, lng: 77.4660 },
         places: [
             { name: 'Meghamalai', description: 'Misty "High Way" mountains famous for tea and cardamom.', image: IMG.HILL },
             { name: 'Suruli Falls', description: 'Two-stage waterfall known for its medicinal properties.', image: IMG.FOREST },
@@ -516,6 +542,7 @@ export const mockLocations = {
     },
     Thoothukudi: {
         name: 'Thoothukudi',
+        coordinates: { lat: 8.7642, lng: 78.1348 },
         places: [
             { name: 'Tuticorin Beach', description: 'Serene coastline perfect for sea-side relaxations.', image: IMG.BEACH },
             { name: 'Hare Island', description: 'Eco-tourism island famous for its local ecosystem.', image: IMG.BEACH },
@@ -528,6 +555,7 @@ export const mockLocations = {
     },
     Tiruchirappalli: {
         name: 'Tiruchirappalli',
+        coordinates: { lat: 10.7905, lng: 78.7047 },
         places: [
             { name: 'Srirangam Temple', description: 'Largest functioning temple complex in the world.', image: IMG.TEMPLE },
             { name: 'Rockfort Temple', description: 'Ancient temple perched on a 273ft high rock.', image: IMG.HERITAGE },
@@ -540,6 +568,7 @@ export const mockLocations = {
     },
     Tirunelveli: {
         name: 'Tirunelveli',
+        coordinates: { lat: 8.7139, lng: 77.7567 },
         places: [
             { name: 'Nellaiappar Temple', description: 'Massive Shiva temple featuring a musical pillar hall.', image: IMG.TEMPLE },
             { name: 'Manimuthar Falls', description: 'Scenic waterfall and reservoir in the Western Ghats.', image: IMG.FOREST },
@@ -551,6 +580,7 @@ export const mockLocations = {
     },
     Tirupathur: {
         name: 'Tirupathur',
+        coordinates: { lat: 12.4988, lng: 78.5678 },
         places: [
             { name: 'Yelagiri Hills', description: 'Nature’s paradise near Chennai known for its hills and rose gardens.', image: IMG.HILL },
             { name: 'Jalagamparai Waterfalls', description: 'Scenic waterfall created by the River Attaru.', image: IMG.FOREST },
@@ -562,6 +592,7 @@ export const mockLocations = {
     },
     Tiruppur: {
         name: 'Tiruppur',
+        coordinates: { lat: 11.1085, lng: 77.3411 },
         places: [
             { name: 'Amaravathi Dam', description: 'Popular picnic spot with a crocodile park nearby.', image: IMG.FOREST },
             { name: 'Avinashi Temple', description: 'Ancient temple known for its carvings and local history.', image: IMG.TEMPLE },
@@ -573,6 +604,7 @@ export const mockLocations = {
     },
     Tiruvallur: {
         name: 'Tiruvallur',
+        coordinates: { lat: 13.1432, lng: 79.9074 },
         places: [
             { name: 'Veera Raghava Perumal Temple', description: 'Ancient Vaishnavaite shrine with healing significance.', image: IMG.TEMPLE },
             { name: 'Pulicat Lake', description: 'Second largest brackish water lake in India.', image: IMG.FOREST },
@@ -584,6 +616,7 @@ export const mockLocations = {
     },
     Tiruvannamalai: {
         name: 'Tiruvannamalai',
+        coordinates: { lat: 12.2276, lng: 79.0660 },
         places: [
             { name: 'Arunachaleswarar Temple', description: 'One of the largest temples in India representing the element of Fire.', image: IMG.TEMPLE },
             { name: 'Arunachala Hill', description: 'Sacred hill considered as a manifestation of Shiva.', image: IMG.HILL },
@@ -596,6 +629,7 @@ export const mockLocations = {
     },
     Tiruvarur: {
         name: 'Tiruvarur',
+        coordinates: { lat: 10.7684, lng: 79.6373 },
         places: [
             { name: 'Thyagaraja Temple', description: 'Home to the world\'s largest and heaviest temple car.', image: IMG.TEMPLE },
             { name: 'Kamalalayam Tank', description: 'Massive sacred tank within the temple complex.', image: IMG.FOREST },
@@ -607,6 +641,7 @@ export const mockLocations = {
     },
     Vellore: {
         name: 'Vellore',
+        coordinates: { lat: 12.9165, lng: 79.1325 },
         places: [
             { name: 'Vellore Fort', description: 'Powerful 16th-century fort made of granite with a massive moat.', image: IMG.HERITAGE },
             { name: 'Sripuram Golden Temple', description: 'Stunning spiritual oasis covered with 1,500kg of pure gold.', image: IMG.HERITAGE },
@@ -618,6 +653,7 @@ export const mockLocations = {
     },
     Viluppuram: {
         name: 'Viluppuram',
+        coordinates: { lat: 11.9399, lng: 79.4935 },
         places: [
             { name: 'GINGEE FORT', description: 'One of the most impregnable forts in India, often called the Troy of the East.', image: '/assets/images/viluppuram/gingee_fort.jpg' },
             { name: 'AUROVILLE', description: 'Experimental township and spiritual destination dedicated to human unity.', image: '/assets/images/viluppuram/auroville.png' },
@@ -629,6 +665,7 @@ export const mockLocations = {
     },
     Virudhunagar: {
         name: 'Virudhunagar',
+        coordinates: { lat: 9.5872, lng: 77.9515 },
         places: [
             { name: 'SRIVILLIPUTHUR ANDAL KOVIL', description: 'Iconic temple tower which is the official emblem of Tamil Nadu Government.', image: '/assets/images/virudhunagar/andal_kovil_1.png' },
             { name: 'Vidhynathan Swamy Temple', description: 'Ancient spiritual sanctuary known for its serene and powerful atmosphere.', image: '/assets/images/virudhunagar/andal_kovil_2.jpg' },

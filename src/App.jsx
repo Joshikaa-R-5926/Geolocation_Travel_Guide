@@ -502,6 +502,8 @@ export default function App() {
     }
 
     const query = searchInput.toLowerCase();
+
+    // 1. Search for a District Key first (Exact or partial match)
     const matchedLocation = Object.keys(mockLocations).find(loc =>
       loc.toLowerCase().includes(query)
     );
@@ -509,10 +511,36 @@ export default function App() {
     if (matchedLocation) {
       handleExplore(matchedLocation);
       setSearchInput('');
-    } else {
-      setSearchAlert(`No guide found for "${searchInput}". Try Chennai, Ooty, or Madurai.`);
-      setTimeout(() => setSearchAlert(null), 3000);
+      return;
     }
+
+    // 2. Search for a specific PLACE (e.g. "Marina Beach")
+    // We scan all places in all districts
+    let foundPlace = null;
+    let foundDistrict = null;
+
+    Object.entries(mockLocations).forEach(([district, data]) => {
+      if (foundPlace) return; // specific find
+      const match = data.places?.find(p => p.name.toLowerCase().includes(query));
+      if (match) {
+        foundPlace = match;
+        foundDistrict = district;
+      }
+    });
+
+    if (foundPlace && foundDistrict) {
+      handleExplore(foundDistrict); // Go to that district
+      // Optionally we could auto-open the detail, but going to the district is safe
+      // Ideally we should maybe filter or scroll, but this is a good start.
+      // Better UX: Filter the destination view to show ONLY this place or highlight it?
+      // simple: just go to district.
+      setSearchInput('');
+      return;
+    }
+
+    // 3. No match found
+    setSearchAlert(`No guide found for "${searchInput}". Try Chennai, Ooty, or Madurai.`);
+    setTimeout(() => setSearchAlert(null), 3000);
   };
 
   return (
@@ -665,7 +693,7 @@ export default function App() {
                 <div>
                   <h2 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', color: 'var(--text)' }}>
                     {place === 'Tamil Nadu' && categoryFilter !== 'All'
-                      ? `All ${categoryFilter}s`
+                      ? `All ${categoryFilter}s in Tamil Nadu`
                       : selectedData?.name}
                   </h2>
                   <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>

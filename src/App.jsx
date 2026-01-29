@@ -666,15 +666,16 @@ export default function App() {
                                 top: '100%',
                                 left: 0,
                                 right: 0,
-                                background: 'rgba(20, 20, 30, 0.95)',
-                                backdropFilter: 'blur(10px)',
-                                borderRadius: '0 0 12px 12px',
-                                marginTop: '5px',
+                                background: '#0f172a', // Solid dark background
+                                borderRadius: '12px',
+                                marginTop: '8px',
                                 padding: '0.5rem 0',
                                 listStyle: 'none',
-                                zIndex: 100,
-                                border: '1px solid var(--glass-border)',
-                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                                zIndex: 9999, // Super high z-index
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+                                maxHeight: '300px', // Prevent too long
+                                overflowY: 'auto'
                               }}
                             >
                               {suggestions.map((s, i) => (
@@ -682,23 +683,31 @@ export default function App() {
                                   key={i}
                                   onClick={() => handleExplore(s.name)}
                                   style={{
-                                    padding: '0.75rem 1.5rem',
+                                    padding: '1rem 1.5rem',
                                     cursor: 'pointer',
                                     borderBottom: i !== suggestions.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     color: 'white',
-                                    transition: 'background 0.2s'
+                                    transition: 'background 0.2s',
+                                    background: 'transparent'
                                   }}
                                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    {s.type === 'District' ? <MapPin size={16} color="var(--primary)" /> : <TreePine size={16} color="var(--accent)" />}
-                                    <span>{s.name}</span>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{
+                                      padding: '8px',
+                                      borderRadius: '50%',
+                                      background: s.type === 'District' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(34, 211, 238, 0.2)',
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                      {s.type === 'District' ? <MapPin size={16} color="var(--primary)" /> : <TreePine size={16} color="var(--accent)" />}
+                                    </div>
+                                    <span style={{ fontSize: '1rem', fontWeight: 500 }}>{s.name}</span>
                                   </div>
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.type}</span>
+                                  <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.type}</span>
                                 </li>
                               ))}
                             </motion.ul>

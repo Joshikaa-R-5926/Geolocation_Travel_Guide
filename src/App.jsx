@@ -44,9 +44,6 @@ const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
       <span>TN Guide</span>
     </div>
     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-      <div className="glass hide-mobile" style={{ padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--success)', border: '1px solid var(--success)', marginRight: '0.5rem' }}>
-        <Zap size={14} /> Offline Ready
-      </div>
       <button
         onClick={() => setIsLightMode(!isLightMode)}
         className="glass theme-toggle-btn"

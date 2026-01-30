@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, MapPin, DollarSign, CloudSun, Compass, Navigation, Zap, X, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, Heart, Tag, Search, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Home, MapPin, DollarSign, CloudSun, Compass, Navigation, Zap, X, Car, Calendar, ArrowLeft, Map, Sun, Moon, Trophy, AlertTriangle, Heart, Tag, Search, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, Clock, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
@@ -217,6 +217,22 @@ const DetailModal = ({ place, onClose }) => (
               <span style={{ fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>How to Reach</span>
             </div>
             <p style={{ margin: '0', fontSize: '1rem', color: 'var(--text)' }}>{place?.howToReach || 'Well connected by road and rail from major cities.'}</p>
+          </div>
+
+          <div className="glass" style={{ padding: '1.5rem', background: 'var(--glass-highlight)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--primary)', marginBottom: '10px' }}>
+              <Clock size={20} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Opening Hours</span>
+            </div>
+            <p style={{ margin: '0', fontSize: '1rem', color: 'var(--text)' }}>{place?.openingHours || '9:00 AM - 6:00 PM'}</p>
+          </div>
+
+          <div className="glass" style={{ padding: '1.5rem', background: 'var(--glass-highlight)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent)', marginBottom: '10px' }}>
+              <Sparkles size={20} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>Visitor Tips</span>
+            </div>
+            <p style={{ margin: '0', fontSize: '1rem', color: 'var(--text)' }}>{place?.visitorTips || 'Wear comfortable clothing and carry water.'}</p>
           </div>
         </div>
 
@@ -569,7 +585,7 @@ export default function App() {
           {screen === 'home' && (
             <PageTransition key="home">
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '4rem', alignItems: 'center', marginTop: '5vh' }}>
-                <div>
+                <div className="hero-content">
                   <motion.h1
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}

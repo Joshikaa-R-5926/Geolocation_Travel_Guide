@@ -28,6 +28,14 @@
   --primary-glow: rgba(249, 115, 22, 0.2);
 }
 
+:root.light-mode .hero-content h1 {
+  color: #0f172a !important;
+}
+
+:root.light-mode .hero-content p {
+  color: #334155 !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

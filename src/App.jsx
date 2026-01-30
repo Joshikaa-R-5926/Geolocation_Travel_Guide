@@ -5,6 +5,7 @@ import { mockLocations, IMG } from './supabase';
 import { StarRating } from './components/StarRating';
 import BudgetCalculator from './components/BudgetCalculator';
 import WeatherInfo from './components/WeatherInfo';
+import { Auth } from './components/Auth';
 
 // --- Helper for Global Search ---
 const getAllPlaces = () => {
@@ -35,7 +36,7 @@ const PageTransition = ({ children }) => (
   </motion.div>
 );
 
-const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
+const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode, user, onLogout }) => (
   <nav className="navbar">
     <div className="logo" onClick={() => setScreen('home')} style={{ cursor: 'pointer' }}>
       <Compass size={32} />
@@ -56,6 +57,15 @@ const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
       >
         Home
       </button>
+      {user && (
+        <button
+          onClick={onLogout}
+          className="nav-btn"
+          style={{ color: 'var(--warning)', border: '1px solid var(--warning)', padding: '0.4rem 0.8rem', borderRadius: '8px' }}
+        >
+          Logout
+        </button>
+      )}
     </div>
   </nav>
 );
@@ -447,6 +457,7 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
   const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   // Search State
   const [searchInput, setSearchInput] = useState('');
@@ -574,9 +585,13 @@ export default function App() {
     setTimeout(() => setSearchAlert(null), 3000);
   };
 
+  if (!user) {
+    return <Auth onLogin={setUser} />;
+  }
+
   return (
     <div style={{ minHeight: '100vh' }}>
-      <Navbar screen={screen} setScreen={setScreen} isLightMode={isLightMode} setIsLightMode={setIsLightMode} />
+      <Navbar screen={screen} setScreen={setScreen} isLightMode={isLightMode} setIsLightMode={setIsLightMode} user={user} onLogout={() => setUser(null)} />
       <div className="container">
         <AnimatePresence mode="wait">
           {screen === 'home' && (

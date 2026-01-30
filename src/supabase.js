@@ -50,28 +50,41 @@ const getCategory = (name) => {
 
 // Enhance places with ratings and metadata
 const enhancePlaces = (places) => {
-    return places.map((place, idx) => ({
-        ...place,
-        rating: place.rating || getRating(idx),
-        reviewCount: place.reviewCount || getReviewCount(idx),
-        category: place.category || getCategory(place.name),
-        entryFee: place.entryFee || (Math.random() > 0.6 ? 'Free' : `₹${[20, 30, 50, 100, 150][idx % 5]}`),
-        duration: place.duration || ['1-2 hours', '2-3 hours', '3-4 hours', 'Half day', 'Full day'][idx % 5],
-        bestTime: place.bestTime || [
-            'Oct to Mar (Pleasant weather)',
-            'Dawn (5 AM - 7 AM) for solitude and sunrise',
-            'Evening (5 PM - 8 PM) for sunsets and cool breeze',
-            'Weekdays to avoid heavy weekend crowds'
-        ][idx % 4],
-        openingHours: place.openingHours || (idx % 3 === 0 ? '6:00 AM - 8:00 PM' : idx % 3 === 1 ? '9:00 AM - 6:00 PM' : 'Open 24 Hours'),
-        visitorTips: place.visitorTips || [
-            'Wear comfortable walking shoes.',
-            'Carry a water bottle to stay hydrated.',
-            'Photography is allowed (no flash inside).',
-            'Try local snacks from nearby stalls.'
-        ][idx % 4],
-        badge: place.badge || (idx < 2 ? 'Must Visit' : idx < 4 ? 'Popular' : null)
-    }));
+    return places.map((place, idx) => {
+        const category = place.category || getCategory(place.name);
+
+        // Define fallback based on category
+        let fallback = IMG.HERITAGE;
+        if (category.includes('Temple')) fallback = IMG.TEMPLE;
+        else if (category.includes('Beach')) fallback = IMG.BEACH;
+        else if (category.includes('Hill Station')) fallback = IMG.HILL;
+        else if (category.includes('Nature') || category.includes('Waterfall')) fallback = IMG.FOREST;
+
+        return {
+            ...place,
+            rating: place.rating || getRating(idx),
+            reviewCount: place.reviewCount || getReviewCount(idx),
+            category: category,
+            image: place.image || fallback,
+            images: place.images || [place.image || fallback, fallback],
+            entryFee: place.entryFee || (Math.random() > 0.6 ? 'Free' : `₹${[20, 30, 50, 100, 150][idx % 5]}`),
+            duration: place.duration || ['1-2 hours', '2-3 hours', '3-4 hours', 'Half day', 'Full day'][idx % 5],
+            bestTime: place.bestTime || [
+                'Oct to Mar (Pleasant weather)',
+                'Dawn (5 AM - 7 AM) for solitude and sunrise',
+                'Evening (5 PM - 8 PM) for sunsets and cool breeze',
+                'Weekdays to avoid heavy weekend crowds'
+            ][idx % 4],
+            openingHours: place.openingHours || (idx % 3 === 0 ? '6:00 AM - 8:00 PM' : idx % 3 === 1 ? '9:00 AM - 6:00 PM' : 'Open 24 Hours'),
+            visitorTips: place.visitorTips || [
+                'Wear comfortable walking shoes.',
+                'Carry a water bottle to stay hydrated.',
+                'Photography is allowed (no flash inside).',
+                'Try local snacks from nearby stalls.'
+            ][idx % 4],
+            badge: place.badge || (idx < 2 ? 'Must Visit' : idx < 4 ? 'Popular' : null)
+        };
+    });
 };
 
 export const mockLocations = {

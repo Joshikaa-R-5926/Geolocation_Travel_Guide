@@ -14,9 +14,7 @@ const getAllPlaces = () => {
       // Add district name to each place for context
       const placesWithDistrict = data.places.map(p => ({
         ...p,
-        district: districtName,
-        // Ensure image fallback exists
-        image: p.image || IMG.HERITAGE
+        district: districtName
       }));
       allPlaces.push(...placesWithDistrict);
     }
@@ -64,6 +62,7 @@ const Navbar = ({ screen, setScreen, isLightMode, setIsLightMode }) => (
 
 const Carousel = ({ images, name }) => {
   const [current, setCurrent] = useState(0);
+  const [hasError, setHasError] = useState({});
 
   useEffect(() => {
     if (!images || images.length <= 1) return;
@@ -73,16 +72,17 @@ const Carousel = ({ images, name }) => {
     return () => clearInterval(timer);
   }, [images]);
 
-  const displayImages = images || [IMG.HERITAGE];
+  const displayImages = (images && images.length > 0) ? images : [IMG.HERITAGE];
 
   return (
     <div className="carousel-container">
       {displayImages.map((img, idx) => (
         <div key={idx} className={`carousel-slide ${idx === current ? 'active' : ''}`}>
           <img
-            src={img}
+            src={hasError[idx] ? IMG.HERITAGE : img}
             alt={`${name} view ${idx + 1}`}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={() => setHasError(prev => ({ ...prev, [idx]: true }))}
           />
           {displayImages.length > 1 && (
             <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
@@ -749,15 +749,19 @@ export default function App() {
                       <Map size={18} /> {mapView ? 'Show Places' : 'Interactive Map'}
                     </button>
                   )}
-                  <button className="btn-secondary" onClick={() => setIsQuizOpen(true)} style={{ color: 'var(--primary)' }}>
-                    <Trophy size={18} /> Preferences
-                  </button>
-                  <button className="btn-secondary" onClick={() => setScreen('cost')}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1 }}>₹</span> Budget Calculator
-                  </button>
-                  <button className="btn-secondary" onClick={() => setScreen('weather')}>
-                    <CloudSun size={18} /> Weather Info
-                  </button>
+                  {place !== 'Tamil Nadu' && (
+                    <>
+                      <button className="btn-secondary" onClick={() => setIsQuizOpen(true)} style={{ color: 'var(--primary)' }}>
+                        <Trophy size={18} /> Preferences
+                      </button>
+                      <button className="btn-secondary" onClick={() => setScreen('cost')}>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1 }}>₹</span> Budget Calculator
+                      </button>
+                      <button className="btn-secondary" onClick={() => setScreen('weather')}>
+                        <CloudSun size={18} /> Weather Info
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -870,7 +874,15 @@ export default function App() {
                               objectFit: 'cover',
                               transition: 'transform 0.3s ease'
                             }}
-                            onError={(e) => { e.target.src = IMG.HERITAGE; }}
+                            onError={(e) => {
+                              const cat = Array.isArray(p.category) ? p.category[0] : p.category;
+                              let fb = IMG.HERITAGE;
+                              if (cat === 'Temple') fb = IMG.TEMPLE;
+                              else if (cat === 'Beach') fb = IMG.BEACH;
+                              else if (cat === 'Hill Station') fb = IMG.HILL;
+                              else if (cat === 'Nature' || cat === 'Waterfall') fb = IMG.FOREST;
+                              e.target.src = fb;
+                            }}
                             onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                           />

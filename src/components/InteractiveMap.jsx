@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { IMG } from '../supabase';
 
 const containerStyle = {
     width: '100%',
@@ -66,7 +67,12 @@ export const InteractiveMap = ({ center, places, onPlaceClick, apiKey }) => {
                     <div style={{ padding: '8px', color: 'black', maxWidth: '200px' }}>
                         <h4 style={{ margin: '0 0 8px', fontSize: '1rem' }}>{selectedPlace.name}</h4>
                         <div style={{ width: '100%', height: '100px', overflow: 'hidden', borderRadius: '4px', marginBottom: '8px' }}>
-                            <img src={selectedPlace.image} alt={selectedPlace.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img
+                                src={selectedPlace.image}
+                                alt={selectedPlace.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => { e.target.src = IMG.HERITAGE; }}
+                            />
                         </div>
                         <p style={{ fontSize: '0.8rem', margin: '0' }}>{selectedPlace.category}</p>
                     </div>

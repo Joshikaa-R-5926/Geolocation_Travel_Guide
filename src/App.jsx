@@ -753,10 +753,10 @@ export default function App() {
                     </button>
                   )}
                   <button className="btn-secondary" onClick={() => setIsQuizOpen(true)} style={{ color: 'var(--primary)' }}>
-                    <Trophy size={18} /> Take Quiz
+                    <Trophy size={18} /> Preferences
                   </button>
                   <button className="btn-secondary" onClick={() => setScreen('cost')}>
-                    <DollarSign size={18} /> Budget Calculator
+                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', lineHeight: 1 }}>₹</span> Budget Calculator
                   </button>
                   <button className="btn-secondary" onClick={() => setScreen('weather')}>
                     <CloudSun size={18} /> Weather Info
@@ -765,7 +765,7 @@ export default function App() {
               </div>
 
               {mapView && selectedData?.mapEmbedUrl ? (
-                <div className="glass" style={{ height: '600px', padding: '1rem', overflow: 'hidden', borderRadius: '24px' }}>
+                <div className="glass" style={{ height: '600px', padding: '1rem', overflow: 'hidden', borderRadius: '24px', cursor: 'pointer' }}>
                   <iframe
                     src={selectedData.mapEmbedUrl}
                     width="100%"

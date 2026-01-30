@@ -321,20 +321,17 @@ export const mockLocations = {
         name: 'Krishnagiri',
         coordinates: { lat: 12.5262, lng: 78.2148 },
         places: [
-            {
-                name: 'Krishnagiri Dam',
-                description: 'Major irrigation source and scenic weekend picnic spot.',
-                image: IMG.FOREST,
-                images: [
-                    IMG.FOREST,
-                    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=800',
-                    'https://images.unsplash.com/photo-1590424072237-7f938f3883a9?auto=format&fit=crop&q=80&w=800'
-                ]
-            },
-            { name: 'Rayakottai Fort', description: 'Ancient hill fort with significant historical importance.', image: IMG.HERITAGE },
-            { name: 'Mango Farms', description: 'Explore the hub of Asia\'s largest mango producers.', image: IMG.FOREST },
-            { name: 'Government Museum', description: 'Showcasing local archaeology and history.', image: IMG.HERITAGE },
-            { name: 'Avathavadi Lake', description: 'Serene water body perfect for peaceful retreats.', image: IMG.FOREST }
+
+            { name: 'Thally Garden and Lake', description: 'Also known as Little England, a cool climate garden.', image: '/assets/images/krishnagiri/thally_garden.jpg' },
+            { name: 'Aiyur Eco Tourism Park', description: 'Lush green eco park perfect for nature lovers.', image: '/assets/images/krishnagiri/aiyur_eco_park.jpg' },
+            { name: 'Krishnagiri Museum', description: 'Showcasing the history and artifacts of the region.', image: '/assets/images/krishnagiri/krishnagiri_museum.jpg' },
+            { name: 'Chandra Choodaswarar Temple', description: 'Ancient hill temple dedicated to Lord Shiva.', image: '/assets/images/krishnagiri/chandra_choodaswarar_temple.jpg' },
+            { name: 'Kellavarapalli Dam Park', description: 'Popular dam with a park and boating facilities.', image: '/assets/images/krishnagiri/kellavarapalli_dam.jpg' },
+            { name: 'Avathanapatti Lake and Children Park', description: 'Serene lake with a well-maintained children\'s park and boating.', image: '/assets/images/krishnagiri/avathanapatti_lake.jpg' },
+            { name: 'Krishnagiri Dam Park', description: 'Major reservoir with adjacent gardens, ideal for picnics.', image: '/assets/images/krishnagiri/krishnagiri_dam_park.jpg' },
+            { name: 'Rayakottah Fort', description: 'Historical hill fort offering trekking and panoramic views.', image: '/assets/images/krishnagiri/rayakottah_fort.jpg' },
+            { name: 'Krishnagiri Fort', description: 'Prominent rock fort built by Vijayanagar Emperors.', image: '/assets/images/krishnagiri/krishnagiri_fort.jpg' },
+            { name: 'Cauvery South Wildlife Sanctuary', description: 'Protected area rich in biodiversity and wildlife.', image: '/assets/images/krishnagiri/cauvery_south_wildlife.jpg' }
         ],
         mapUrl: 'https://www.google.com/maps/search/krishnagiri+tourist+map+google/@12.514046,78.0080673,10.8z?entry=ttu',
         mapEmbedUrl: 'https://maps.google.com/maps?q=tourist%20places%20in%20Krishnagiri&t=&z=11&ie=UTF8&iwloc=&output=embed',
